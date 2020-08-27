@@ -5,6 +5,7 @@ import datetime
 import math
 import os
 import random
+import sys
 
 from decimal import Decimal
 
@@ -44,9 +45,9 @@ permutations = len(alphabets[args.complexity]) ** args.length
 per = ''
 if args.repeat > 1:
     per = ' per password'
-print('Permutations' + per + ': {:.3e}'.format(Decimal(permutations)))
-print('Entropy' + per + ': {:.0f} bits'.format(math.log(permutations) / math.log(2)))
-print()
+print('Permutations' + per + ': {:.3e}'.format(Decimal(permutations)), file=sys.stderr)
+print('Entropy' + per + ': {:.0f} bits'.format(math.log(permutations) / math.log(2)), file=sys.stderr)
+print(file=sys.stderr)
 
 for i in range(0, args.repeat):
     if args.repeat != 1:

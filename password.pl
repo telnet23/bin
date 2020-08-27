@@ -55,9 +55,9 @@ my $alphabet = $alphabets->[$complexity];
 my $permutations = scalar( @$alphabet ) ** $length;
 my $per = '';
 $per = ' per password' if $repeat > 1;
-printf "Permutations%s: %.3e\n", $per, $permutations;
-printf "Entropy%s: %.0f bits\n", $per, log($permutations) / log(2);
-print "\n";
+printf STDERR "Permutations%s: %.3e\n", $per, $permutations;
+printf STDERR "Entropy%s: %.0f bits\n", $per, log($permutations) / log(2);
+print STDERR "\n";
 
 foreach my $i ( 1 .. $repeat )
 {
