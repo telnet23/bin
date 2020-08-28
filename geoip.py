@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
+
 import argparse
-import json
 import geoip2.database
 import os
 import pytz
@@ -10,6 +11,7 @@ import socket
 from collections import defaultdict
 from datetime import datetime
 
+
 def load_from(base):
     for root, directories, filenames in os.walk(base):
         for directory in directories:
@@ -18,12 +20,13 @@ def load_from(base):
                 path = os.path.join(root, directory)
                 load_from(path)
         for filename in filenames:
-            match = re.match('^Geo(?:IP|Lite)2-(.+)\.mmdb$', filename)
+            match = re.match(r'^Geo(?:IP|Lite)2-(.+).mmdb$', filename)
             if match:
                 method = match.group(1).lower().replace('-', '_')
                 path = os.path.join(root, filename)
                 reader = geoip2.database.Reader(path)
                 readers[method].append(reader)
+
 
 def get(ip, method):
     i = 0
@@ -44,6 +47,7 @@ def get(ip, method):
                 continue
         break
     return record
+
 
 def geoip(ip):
     connection_type = get(ip, 'connection_type')
@@ -114,12 +118,14 @@ def geoip(ip):
     for row in rows:
         print(f'{row[0]}{row[1]: <{maxlen}}  \x1B[1m{row[2]}\x1B[21m\x1B[39m')
 
+
 def my_ip():
     try:
         return requests.get('https://api.ipify.org').text
     except requests.exceptions.ConnectionError:
         return None
- 
+
+
 parser = argparse.ArgumentParser(allow_abbrev=False, description='Query MaxMind GeoIP2 and GeoLite2 databases.')
 parser.add_argument('-d', '--directory', action='append', help='database directory')
 parser.add_argument('ip', nargs='*', help='ip address')
@@ -127,16 +133,14 @@ args = parser.parse_args()
 
 readers = defaultdict(list)
 if not args.directory:
-    args.directory = ['.']
+    args.directory = [os.path.dirname(__file__)]
 for directory in args.directory:
     load_from(directory)
 for method in readers:
     readers[method].sort(key=lambda reader: reader.metadata().build_epoch, reverse=True)
 
 ips = []
-if args.ip is None:
-    ips.append(my_ip())
-else:
+if args.ip:
     for arg in args.ip:
         if arg == '?':
             ip = my_ip()
@@ -154,7 +158,7 @@ else:
             if ip not in ips:
                 ips.append(ip)
             continue
-    
+
         try:
             # Try as hostname
             # An arbitrary port number is required
@@ -167,6 +171,8 @@ else:
                 if ip not in ips:
                     ips.append(ip)
             continue
+else:
+    ips.append(my_ip())
 
 for i in range(len(ips)):
     geoip(ips[i])
