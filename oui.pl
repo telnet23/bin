@@ -5,7 +5,7 @@ use warnings;
 no warnings 'uninitialized';
 
 use FindBin;
-chdir $FindBin::Bin;
+chdir $FindBin::RealBin;
 
 my $RESET  = "\e[0m";
 my $BOLD   = "\e[1m";
