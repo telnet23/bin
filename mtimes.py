@@ -2,14 +2,23 @@
 
 import os
 
+
+def max_mtime(time, path):
+    try:
+        return max(time or 0, os.path.getmtime(path))
+    except (FileNotFoundError, PermissionError):
+        return time
+
+
 for root, directories, files in os.walk('.', topdown=False):
     if root.startswith('./Library'):
         continue
-    times = set()
-    times |= {os.path.getmtime(os.path.join(root, name)) for name in files}
-    times |= {os.path.getmtime(os.path.join(root, name)) for name in directories}
-    if not times:
+    time = None
+    for name in files:
+        time = max_mtime(time, os.path.join(root, name))
+    for name in directories:
+        time = max_mtime(time, os.path.join(root, name))
+    if time is None:
         continue
-    time = max(times)
-    print(root + '  ' + str(round(time)))
     os.utime(root, (time, time))
+    print(f'{time:.0f} {root}')
