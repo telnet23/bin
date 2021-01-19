@@ -27,6 +27,9 @@ def load_from(base):
                 reader = geoip2.database.Reader(path)
                 readers[method].append(reader)
 
+    for method in readers:
+        readers[method].sort(key=lambda reader: reader.metadata().build_epoch, reverse=True)
+
 
 def get(ip, method):
     i = 0
