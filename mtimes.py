@@ -4,6 +4,8 @@ import os
 
 
 def max_mtime(time, path):
+    if os.path.basename(path) in {'.localized', '.DS_Store'}:
+        return time
     try:
         return max(time or 0, os.path.getmtime(path))
     except (FileNotFoundError, PermissionError):
